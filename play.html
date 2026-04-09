@@ -18,10 +18,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow: hidden; /* 防止舞动时出现滚动条 */
+            overflow: hidden;
         }
 
-        /* 顶部导航栏 */
         .header {
             width: 100%;
             padding: 15px 16px;
@@ -43,7 +42,6 @@
             text-decoration: none;
         }
 
-        /* 签到容器 */
         .sign-container {
             flex: 1;
             width: 100%;
@@ -52,10 +50,9 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            position: relative; /* 为图片定位提供基准 */
+            position: relative;
         }
 
-        /* 大圆按钮样式 */
         .sign-circle {
             width: 220px;
             height: 220px;
@@ -71,7 +68,7 @@
             align-items: center;
             box-shadow: 0 10px 30px rgba(25, 140, 255, 0.3);
             transition: all 0.2s ease;
-            z-index: 10; /* 确保按钮在最上层 */
+            z-index: 10;
         }
 
         .sign-circle:active {
@@ -79,22 +76,17 @@
             background-color: #1270CE;
         }
 
-        /* 舞动图片的样式 */
-        /* 注意：我们使用 transition 而不是 animation 来实现随机移动 */
+        /* 舞动图片核心样式 */
         .dancing-img {
             position: absolute;
-            width: 100px; /* 图片大小 */
-            height: 100px;
-            border-radius: 50%; /* 如果是头像可以加圆角 */
-            object-fit: cover;
-            /* 添加过渡动画，让移动更平滑 */
-            transition: all 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
-            /* cubic-bezier 让移动有弹性效果 */
-            pointer-events: none; /* 让图片不阻挡点击事件 */
-            z-index: 1;
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            transition: all 1.2s ease-in-out;
+            pointer-events: none;
+            z-index: 5;
         }
 
-        /* Toast 提示 */
         .toast {
             position: fixed;
             left: 50%;
@@ -123,99 +115,76 @@
 </div>
 
 <div class="sign-container">
-    <!-- 初始签到界面 -->
     <button id="signBtn" class="sign-circle">签到</button>
 </div>
 
 <div class="toast" id="toast">签到成功</div>
 
 <script>
-    // 音频链接（来自参考材料）
+    // ==============================================
+    // 【你只需要改这里！】
+    // 替换成你自己的 阿里云OSS 音频 + 图片地址
+    // ==============================================
     const AUDIO_URL = "https://sky-take-out-exer.oss-cn-beijing.aliyuncs.com/dongbei.mp3";
-    
-    // 图片链接（这里使用一个占位符，你可以替换成你的图片地址）
-    // 如果你需要显示特定的图片，请将 imageUrl 替换为你的图片 URL
-    const IMAGE_URL = "https://sky-take-out-exer.oss-cn-beijing.aliyuncs.com/yujiedajiao.png"; 
+    const IMAGE_URL = "https://sky-take-out-exer.oss-cn-beijing.aliyuncs.com/yujiedajiao.png";
 
     const signBtn = document.getElementById('signBtn');
     const toast = document.getElementById('toast');
+    let dancingImg = null;
 
     signBtn.addEventListener('click', async () => {
-        // 1. 禁用按钮并隐藏
-        signBtn.disabled = true;
-        signBtn.style.opacity = '0.5';
-        setTimeout(() => signBtn.style.display = 'none', 300); // 延迟隐藏以配合动画
+        // 1. 隐藏签到按钮
+        signBtn.style.display = 'none';
 
-        // 2. 播放提示音
-        let audioPlayed = false;
+        // 2. 播放音乐
         try {
             const audio = new Audio(AUDIO_URL);
-            // 在用户交互上下文中播放音频
+            audio.volume = 0.8;
             await audio.play();
-            audioPlayed = true;
-        } catch (e) {
-            console.log("音频播放失败（可能被浏览器策略阻止）:", e);
+        } catch (err) {
+            console.log("音乐播放失败", err);
         }
 
-        // 3. Toast 提示
+        // 3. 提示
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 2000);
 
         // 4. 创建舞动图片
-        const img = document.createElement('img');
-        img.src = IMAGE_URL;
-        img.className = 'dancing-img';
-        document.querySelector('.sign-container').appendChild(img);
+        dancingImg = document.createElement('img');
+        dancingImg.src = IMAGE_URL;
+        dancingImg.className = 'dancing-img';
+        document.querySelector('.sign-container').appendChild(dancingImg);
 
-        // 5. 随机舞动函数
-        // 使用 requestAnimationFrame 实现流畅动画循环
-        function animateDance() {
-            // 获取容器尺寸
-            const container = document.querySelector('.sign-container');
-            const containerRect = container.getBoundingClientRect();
-            
-            // 生成随机位置 (留出图片自身的边距)
-            const maxX = containerRect.width - 100;
-            const maxY = containerRect.height - 100;
-            const randomX = Math.floor(Math.random() * maxX);
-            const randomY = Math.floor(Math.random() * maxY);
+        // 5. 开始疯狂舞动：随机位置 + 随机大小 + 随机旋转
+        function startDance() {
+            const box = document.querySelector('.sign-container');
+            const w = box.clientWidth - 120;
+            const h = box.clientHeight - 120;
 
-            // 应用随机位置
-            img.style.left = randomX + 'px';
-            img.style.top = randomY + 'px';
+            // 随机位置
+            const x = Math.random() * w;
+            const y = Math.random() * h;
 
-            // 为了模拟“舞动”，我们可以在每次移动后改变一点旋转角度
-            const randomRotate = Math.random() * 20 - 10; // -10deg 到 10deg
-            img.style.transform = `rotate(${randomRotate}deg)`;
+            // 随机大小（0.6 ~ 1.5 倍）
+            const scale = 0.6 + Math.random() * 0.9;
 
-            // 1.5秒后再次移动（与CSS transition 时间对应）
-            setTimeout(() => {
-                // 增加一点趣味性：在移动后有一定概率改变大小
-                if (Math.random() > 0.7) {
-                    const scale = 0.8 + Math.random() * 0.6; // 0.8 - 1.4 倍
-                    img.style.transform = `scale(${scale}) rotate(${randomRotate}deg)`;
-                }
-                // 递归调用，形成持续的动画
-                animateDance();
-            }, 1600);
+            // 随机旋转（-30° ~ 30°）
+            const rotate = Math.random() * 60 - 30;
+
+            // 应用效果
+            dancingImg.style.left = x + 'px';
+            dancingImg.style.top = y + 'px';
+            dancingImg.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+
+            // 每隔 1.2 秒变一次
+            setTimeout(startDance, 1200);
         }
 
-        // 确保图片加载完成后再开始动画，防止第一次位置获取错误
-        img.onload = function() {
-            // 初始化位置为按钮附近
-            img.style.left = (signBtn.offsetLeft + 60) + 'px';
-            img.style.top = (signBtn.offsetTop + 60) + 'px';
-            
-            // 开始舞动
-            animateDance();
-        };
-
-        // 错误处理：如果图片加载失败
-        img.onerror = function() {
-            console.error('图片加载失败，请检查 URL');
+        // 图片加载完立刻开始舞动
+        dancingImg.onload = function () {
+            startDance();
         };
     });
 </script>
-
 </body>
 </html>
