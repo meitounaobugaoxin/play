@@ -2,124 +2,190 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大学生求职指南 · 2026届专版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>签到</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: #f2f4f8;
-            font-family: 'Segoe UI', 'Roboto', system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            padding: 2rem 1rem;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: #F5F6F7;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .container {
-            max-width: 880px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            overflow: hidden;
-        }
+
+        /* 顶部导航栏 */
         .header {
-            background: #1e3a5f;
-            padding: 2rem 2.5rem;
-            color: white;
-            border-bottom: 4px solid #ffae42;
+            width: 100%;
+            padding: 15px 16px;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 500;
+            color: #333;
+            background-color: #FFFFFF;
+            position: relative;
         }
-        .header h1 { font-size: 1.8rem; font-weight: 600; }
-        .header .sub { font-size: 0.9rem; opacity: 0.85; border-left: 3px solid #ffae42; padding-left: 1rem; margin-top: 0.5rem; }
-        .content { padding: 2rem 2.5rem; }
-        .section { margin-bottom: 2rem; }
-        .section h2 { font-size: 1.4rem; color: #1e3a5f; border-left: 5px solid #ffae42; padding-left: 0.8rem; margin-bottom: 1rem; }
-        .section p { margin-bottom: 0.8rem; color: #2c3e4e; text-align: justify; }
-        .tip-box { background: #f8fafc; border-left: 4px solid #ffae42; padding: 1rem 1.5rem; border-radius: 8px; margin: 1rem 0; }
-        .resource-card { background: #fef7e0; border: 1px solid #ffe0a3; border-radius: 16px; padding: 1.2rem 1.8rem; text-align: center; margin: 2rem 0; }
-        .fake-link { background: none; border: none; font-size: 1.25rem; font-weight: 600; color: #1e6f5c; text-decoration: underline; cursor: pointer; font-family: inherit; }
-        .fake-link:hover { color: #c2492d; }
-        .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.75rem; color: #6c86a3; text-align: center; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2d2f36e6; backdrop-filter: blur(8px); color: #ffecb3; padding: 6px 16px; border-radius: 40px; font-size: 0.8rem; opacity: 0; transition: 0.2s; pointer-events: none; z-index: 1000; }
-        .toast.show { opacity: 1; }
-        @media (max-width: 640px) { .header, .content { padding: 1.5rem; } }
+
+        .back-btn {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        /* 签到容器 */
+        .sign-container {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 大圆按钮样式 */
+        .sign-circle {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background-color: #198CFF;
+            color: white;
+            border: none;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(25, 140, 255, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .sign-circle:active {
+            transform: scale(0.96);
+            background-color: #1270CE;
+        }
+
+        .sign-circle:disabled {
+            background-color: #198CFF;
+            cursor: default;
+            transform: none;
+        }
+
+        /* 签到成功样式 */
+        .success-wrapper {
+            display: none;
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+
+        .success-text {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .time-text {
+            font-size: 16px;
+            color: #999;
+        }
+
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 60px;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>📘 大学生求职指南</h1>
-        <div class="sub">2026 届毕业生 · 系统化求职策略</div>
-    </div>
-    <div class="content">
-        <div class="section">
-            <h2>行业趋势与定位</h2>
-            <p>2026 年高校毕业生预计 1198 万，但 AI、新能源、大健康等领域优质岗位仍增长。建议结合霍兰德测评和技能盘点，锁定 3 个目标岗位。</p>
-        </div>
-        <div class="section">
-            <h2>简历优化 · ATS 突破</h2>
-            <p>使用 STAR 法则量化经历，例如“通过优化投放策略，ROI 提升 32%”。避免表格和图片，一页纸为佳。</p>
-            <div class="tip-box">📌 工具推荐：牛客网简历模板、超级简历智能打分</div>
-        </div>
-        <div class="section">
-            <h2>面试通关策略</h2>
-            <p>准备 8-10 个高价值故事（领导力、冲突解决等）。技术岗刷 LeetCode 高频，非技术岗练案例分析框架。</p>
-        </div>
 
-        <!-- 伪装链接 -->
-        <div class="resource-card">
-            <p>✨ 导师内推 · 独家面试题库 ✨</p>
-            <button id="playBtn" class="fake-link">📁 大学生求职指南 · 内部资料包（限时开放）</button>
-            <p style="font-size: 0.7rem; margin-top: 0.5rem;">🔐 已认证合作企业 | 每日更新 30 个名额</p>
-        </div>
+<div class="header">
+    <a href="javascript:history.back()" class="back-btn">&lt;</a>
+    签到
+</div>
 
-        <div class="footer">© 2026 全国高校职业发展联盟 · 内容公益分享</div>
+<div class="sign-container">
+    <!-- 初始签到界面 -->
+    <button id="signBtn" class="sign-circle">签到</button>
+
+    <!-- 签到成功界面 (默认隐藏) -->
+    <div id="successView" class="success-wrapper">
+        <svg class="success-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#2DB36E" d="M425.813333 738.133333l-273.066666-273.066666 62.250666-62.250667 210.816 210.816 425.813334-425.813333 62.250667 62.250666-488.064 488.064z"/>
+        </svg>
+        <div class="success-text">签到成功</div>
+        <div id="timeDisplay" class="time-text"></div>
     </div>
 </div>
-<div id="toast" class="toast">🎵 东北雨姐BGM · 气势拿捏 🎵</div>
+
+<div class="toast" id="toast">签到成功</div>
 
 <script>
-    const AUDIO_URL = "https://sky-take-out-exer.oss-cn-beijing.aliyuncs.com/%E5%A4%A7%E4%B8%9C%E5%8C%97%E6%88%91%E7%9A%84%E5%AE%B6%E4%B9%A1DJE7%89%88_%E7%88%B1%E7%BB%99%E7%BD%91_aigei_com.mp3";
-    let currentBlobUrl = null;
-    let audio = null;
+    // 音频链接
+    const AUDIO_URL = "https://sky-take-out-exer.oss-cn-beijing.aliyuncs.com/dongbei.mp3";
 
-    function showToast(msg) {
-        const toast = document.getElementById('toast');
-        toast.textContent = msg || "🎵 东北雨姐BGM · 气势拿捏 🎵";
+    const signBtn = document.getElementById('signBtn');
+    const successView = document.getElementById('successView');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const toast = document.getElementById('toast');
+
+    signBtn.addEventListener('click', async () => {
+        // 1. 禁用按钮，切换显示
+        signBtn.style.display = 'none';
+        successView.style.display = 'block';
+
+        // 2. 显示当前时间
+        const now = new Date();
+        const formattedTime = now.getMonth() + 1 + '-' + now.getDate() + ' ' + formatTwoDigits(now.getHours()) + ':' + formatTwoDigits(now.getMinutes());
+        timeDisplay.textContent = formattedTime;
+
+        // 3. 播放提示音
+        try {
+            const audio = new Audio(AUDIO_URL);
+            await audio.play();
+        } catch (e) {
+            console.log("播放失败:", e);
+        }
+
+        // 4. Toast 提示
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 2000);
-    }
-
-    async function playMusic() {
-        // 清理之前的播放
-        if (audio) {
-            audio.pause();
-            if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
-        }
-
-        showToast("📡 加载音乐中，请稍候...");
-
-        try {
-            // 1. fetch 音频文件（绕过下载头）
-            const response = await fetch(AUDIO_URL);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const blob = await response.blob();
-            // 2. 创建 blob URL
-            currentBlobUrl = URL.createObjectURL(blob);
-            audio = new Audio(currentBlobUrl);
-            // 3. 播放
-            await audio.play();
-            showToast("🎵 大东北我的家乡 · 雨姐来啦 🎵");
-            audio.onended = () => {
-                URL.revokeObjectURL(currentBlobUrl);
-                currentBlobUrl = null;
-            };
-        } catch (err) {
-            console.error(err);
-            showToast("❌ 播放失败，请检查网络或稍后重试");
-        }
-    }
-
-    document.getElementById('playBtn').addEventListener('click', () => {
-        playMusic();
-        if (navigator.vibrate) navigator.vibrate(80);
     });
+
+    // 辅助函数：补零
+    function formatTwoDigits(num) {
+        return num.toString().padStart(2, '0');
+    }
 </script>
+
 </body>
 </html>
